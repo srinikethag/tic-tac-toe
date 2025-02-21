@@ -11,22 +11,22 @@ public class Main {
         Game game = GameController.initializeGame();
 
         GameController gc = new GameController(game);
-        game.getBoard().displayBoard();
+        gc.boardController.displayBoard();
         while(game.getGameState().equals(GameState.IN_PROGRESS)){
 
             gc.makeNextMove();
-            game.getBoard().displayBoard();
+            gc.boardController.displayBoard();
             Scanner sc = new Scanner(System.in);
             System.out.println("Do you want to undo last move?");
             String ans = sc.next();
             if(ans.equalsIgnoreCase("y")){
                 gc.undoLastMove();
                 System.out.println("Last move is reverted");
-                game.getBoard().displayBoard();
+                gc.boardController.displayBoard();
             }
         }
 
-        game.getBoard().displayBoard();
+        gc.boardController.displayBoard();
 
         if(game.getGameState().equals(GameState.WON)){
             System.out.println("The winner of the game is " + game.getWinner().getName());

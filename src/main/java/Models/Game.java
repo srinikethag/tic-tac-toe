@@ -47,37 +47,5 @@ public class Game {
         gameState = GameState.DRAW;
     }
 
-    /**
-     * This method makes the next player decide a move and updates the board
-     */
-    public void makeMoveForCurrPlayer(){
-        Player currPlayer = this.playerList.get(currentPlayerIndex);
-        Cell cell = currPlayer.makeMove(currPlayer, this.board);
-
-        // Update the board with that move and corresponding validation.
-        // if it fails again try to make the move
-        try{
-            this.getBoard().updateBoard(cell, currPlayer);
-            this.moves.add(cell);
-        } catch (IllegalArgumentException e){
-            System.out.println("Please choose a valid cell");
-            makeMoveForCurrPlayer();
-        }
-
-
-    }
-
-    public void postMoveWinnerCheck(){
-        boolean isWin = this.getWinningStrategies().stream()
-                .anyMatch(winningStrategy -> winningStrategy.isWinning(this));
-
-        if(isWin){
-            this.setWinner();
-        } else {
-            this.currentPlayerIndex++;
-            // limit only to number of players
-            this.currentPlayerIndex %= this.playerList.size();
-        }
-    }
 
 }

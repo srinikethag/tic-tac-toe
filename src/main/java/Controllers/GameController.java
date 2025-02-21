@@ -8,10 +8,12 @@ import java.util.Scanner;
 public class GameController {
 
     Game game;
+    public BoardController boardController;
 
     public GameController(Game game){
         this.game = game;
         this.game.gameState = GameState.IN_PROGRESS;
+        this.boardController = new BoardController(this.game.board);
     }
 
     public static Game initializeGame(){
@@ -52,7 +54,7 @@ public class GameController {
 
     public void makeNextMove(){
 
-        if(game.board.isFull()){
+        if(boardController.isFull()){
             game.setDraw();
             return;
         }
@@ -63,10 +65,10 @@ public class GameController {
 
         // Step 2: Calls the makeMove method for the corresponding player
         System.out.printf("It's %s's move\n", currPlayer.getName());
-        game.makeMoveForCurrPlayer();
+        makeMoveForCurrPlayer();
 
         // Step 3: Check all the winning strategies
-        game.postMoveWinnerCheck();
+        postMoveWinnerCheck();
 
     }
 
@@ -85,5 +87,37 @@ public class GameController {
         game.currentPlayerIndex--;
         game.currentPlayerIndex = (game.currentPlayerIndex + game.playerList.size() ) % game.playerList.size();
 
+    }
+
+    /**
+     * This method makes the next player decide a move and updates the board
+     */
+    public void makeMoveForCurrPlayer(){
+        Player currPlayer = game.playerList.get(game.currentPlayerIndex);
+        Cell cell = currPlayer.makeMove(currPlayer, game.board);
+
+        // Update the board with that move and corresponding validation.
+        // if it fails again try to make the move
+        try{
+            boardController.updateBoard(cell, currPlayer);
+            game.moves.add(cell);
+        } catch (IllegalArgumentException e){
+            System.out.println("Please choose a valid cell");
+            makeMoveForCurrPlayer();
+        }
+
+    }
+
+    public void postMoveWinnerCheck(){
+        boolean isWin = game.getWinningStrategies().stream()
+                .anyMatch(winningStrategy -> winningStrategy.isWinning(game));
+
+        if(isWin){
+            game.setWinner();
+        } else {
+            game.currentPlayerIndex++;
+            // limit only to number of players
+            game.currentPlayerIndex %= game.playerList.size();
+        }
     }
 }
